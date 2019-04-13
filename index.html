@@ -180,9 +180,15 @@
       padding: 1vh 0;
     }
 
-    #changeName input[type="submit"] {
+    #changeName input[type="submit"], #changeName input[type="button"] {
       cursor: pointer;
       color: rgb(58, 58, 58);
+    }
+
+    #changeName #delete {
+      display: block;
+      margin: 1vh auto 0 auto;
+      background-color: #ff7a6e;
     }
 
     .visits {
@@ -269,7 +275,8 @@
     <form id="changeName">
       <label for="name">Don't like Your name?️</label>
       <input id="name" placeholder="Write something you like! 👍" type="text">
-      <input type="submit" value="🔧 change it here">
+      <input id="change_name" type="submit" value="🔧 change it here">
+      <input id="delete" type="button" value="🚫 Delete visitor and its history">
     </form>
 
     <div class="visits">
@@ -300,7 +307,8 @@
         subtitle: document.querySelector('.subtitle'),
         cnForm: document.querySelector('form#changeName'),
         cnFormInput: document.querySelector('form#changeName input[type="text"]'),
-        cnFormSubmit: document.querySelector('form#changeName input[type="submit"]'),
+        cnFormChangeName: document.querySelector('form#changeName #change_name'),
+        cnFormDelete: document.querySelector('form#changeName #delete'),
         visitsHeader: document.querySelector('.visits .header'),
         visitsContent: document.querySelector('.visits .content')
       };
@@ -419,6 +427,47 @@
               scene.title.innerHTML = 'Hello ' + name;
 
               alert('👍 Changed successfully!');
+            } else {
+              if (res.error) {
+                console.error(res.error);
+              }
+              alert('⚠️ Something goes wrong... :(\n' + 'See browser log for more details');
+            }
+          }
+        });
+      }
+
+      scene.cnFormDelete.addEventListener('click', function(e) {
+        if (!visitor) {
+          alert('⚠️ Unknown visitor');
+          return;
+        }
+
+        var result = confirm("Are You sure?");
+        if (result) {
+          requestVisitorsDelete();
+        }
+      });
+
+      function requestVisitorsDelete() {
+        information.makeXhrRequest({
+          action: 'DELETE',
+          url: host + '/data/traceUserSite/visitor/' + visitor._id,
+          timeout: 5000,
+          onTimeout: function() {
+            alert('⚠️ Server doesn\'t reply... :(\n' + 'Please try again later.');
+          },
+          onError: function(err) {
+            alert('⚠️ Something goes wrong... :(\n' + 'Please try again later.');
+            console.error(err)
+          },
+          onSuccess: function(res) {
+            res = JSON.parse(res);
+            if (res.result == 'success') {
+              alert('👍 Delete successfully!\n' +
+                  'Page will automatically reload.\n' +
+                  'If You don\'t want to create another account, please leave this site now!');
+              location.reload();
             } else {
               if (res.error) {
                 console.error(res.error);
