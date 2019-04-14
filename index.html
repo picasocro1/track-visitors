@@ -443,7 +443,9 @@
           return;
         }
 
-        var result = confirm("Are You sure?");
+        var result = confirm('⚡ Are you sure, you want to delete all of your data?\n\n' +
+            '⚠️ If you don\'t mind: leaving your visits data will help me improve my algorithms!\n\n' +
+            'I swear not use it to trace you in the future :)');
         if (result) {
           requestVisitorsDelete();
         }
